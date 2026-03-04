@@ -2,6 +2,8 @@ package io.github.ruanvasco.api.service;
 
 import io.github.ruanvasco.api.dto.UserDto;
 import io.github.ruanvasco.api.entity.User;
+import io.github.ruanvasco.api.exception.FileProcessingException;
+import io.github.ruanvasco.api.exception.UserNotFoundException;
 import io.github.ruanvasco.api.mapper.UserMapper;
 import io.github.ruanvasco.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -45,13 +47,13 @@ public class UserService {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e); // Criar uma exceção personalizada
+            throw new FileProcessingException("Error processing JSON file", e);
         }
     }
 
     public UserDto findById(String id) {
-        User user = userRepository.findById(id).orElseThrow();
-        return userMapper.toDto(user);
+        return userRepository.findById(id)
+                .map(userMapper::toDto)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
-
 }
