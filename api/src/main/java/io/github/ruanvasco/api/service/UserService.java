@@ -49,4 +49,9 @@ public class UserService {
         }
     }
 
+    public UserDto findById(String id) {
+        User user = userRepository.findById(id).orElseThrow();
+        return userMapper.toDto(user);
+    }
+
 }
