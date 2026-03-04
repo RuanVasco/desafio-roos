@@ -1,0 +1,13 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: user-batch-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlite:/app/data/database.db
+    volumes:
+      - ./api/data:/app/data
+    restart: unless-stopped
