@@ -25,7 +25,7 @@
 ### 2. Execução via Docker
 - Na raiz do projeto: ```docker compose up --build```.
 
-### 3. Execução Local
+### 3. Execução Local (necessário o JDK 25)
 - ```cd api```.
 - ```./mvnw spring-boot:run```.
 
