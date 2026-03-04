@@ -1,7 +1,7 @@
 package io.github.ruanvasco.api.controller;
 
 import io.github.ruanvasco.api.dto.UserDto;
-import io.github.ruanvasco.api.entity.User;
+import io.github.ruanvasco.api.dto.UserResponseDto;
 import io.github.ruanvasco.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +22,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable String id) {
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable String id) {
         UserDto user = userService.findById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(new UserResponseDto(user));
     }
 }
