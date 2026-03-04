@@ -1,104 +1,61 @@
 # User Data Processing API
 
-## Descrição
+---
 
-Este teste tem como objetivo avaliar:
+## Pré-requisitos
 
-- Boas práticas de programação
-- Organização e estruturação de código
-- Performance da aplicação
-- Clareza na documentação
+### 1. Docker
+
+- Docker Engine: Testado com a versão 28.2.2.
+- Docker Compose: Testado com a versão 2.37.1.
+
+### 2. Local
+
+- JDK: Testado com 25.0.2.
+- Maven: Testado com a versão 3.9.12 (via wrapper ./api/mvnw).
 
 ---
 
-## Objetivo
+## Passo a passo para instalação
 
-Este repositório contém um arquivo `.json` com aproximadamente **32.000 usuários fictícios**.
+### 1. Instalação
+- ```git clone https://github.com/RuanVasco/desafio-roos.git```.
+- ```cd desafio-roos```.
 
-O objetivo do projeto é desenvolver uma **REST API** capaz de:
+### 2. Execução via Docker
+- Na raiz do projeto: ```docker compose up --build```.
 
-1. Receber um arquivo `.json` por meio de uma URL enviada via `form-data`;
-2. Processar e persistir os dados conforme os requisitos definidos;
-3. Disponibilizar os dados processados para consulta através de endpoints.
-
----
-
-## Requisitos Funcionais
-
-### 1. Recebimento do arquivo `.json`
-
-- O arquivo `.json` deverá ser enviado por meio de uma **URL**, utilizando `form-data`;
-- Após o recebimento, a API deverá:
-  - Processar seu conteúdo;
-  - Armazenar todos os usuários no banco de dados.
-
-#### Dados obrigatórios a serem armazenados:
-
-- `id`
-- `first_name`
-- `last_name`
-- `email`
+### 3. Execução Local
+- ```cd api```.
+- ```./mvnw spring-boot:run```.
 
 ---
 
-### 2. Busca individual de usuário
+## Testar os endpoints
+Existem dois endpoints:
+- POST /users/upload
+- GET /users/{id}
 
-- A API deverá disponibilizar um endpoint para consulta de um usuário específico;
-- O **ID do usuário** deverá ser utilizado como parâmetro na URL;
-- A resposta deverá ser retornada no formato JSON conforme o exemplo abaixo:
+### 1. Swagger
+- Acesse ```http://localhost:8080/swagger-ui/index.html```.
+- Será possível fazer as requisições via interface web.
 
-```json
-{
-  "user": {
-    "id": "5df38f6e695566a48211da8f",
-    "first_name": "Blankenship",
-    "last_name": "Vincent",
-    "email": "blankenshipvincent@rocklogic.com"
-  }
-}
+### 2. CURL
+- POST
+```
+  curl -X POST http://localhost:8080/users/upload \
+  -F "file=@mock-data.json"
+  ```
+- GET
+```
+  curl -X GET http://localhost:8080/users/5df38f6e695566a48211da8f
 ```
 
 ---
 
-## Endpoints
+## Notas sobre o código
 
-> A nomenclatura dos endpoints fica a critério do desenvolvedor, porém deve ser devidamente documentada.
-
-Endpoints esperados:
-
-- Endpoint para recebimento e processamento do arquivo `.json`
-- Endpoint para busca individual de usuário por ID
-
----
-
-## Requisitos Técnicos
-
-- A linguagem de programação é de livre escolha;
-- Todos os arquivos da API deverão estar dentro do diretório `api`;
-- Não é necessária autenticação de usuário;
-- A nomenclatura dos endpoints fica a critério do desenvolvedor, porém deve ser devidamente documentada;
-- A aplicação deverá conter instruções claras para execução local do projeto.
-
----
-
-## Critérios de Avaliação
-
-- Organização da estrutura do projeto
-- Clareza e padronização do código
-- Tratamento de erros
-- Validação de dados
-- Performance no processamento do arquivo
-- Documentação da API
-- Boas práticas (ex: separação de camadas, uso de padrões, etc.)
-
----
-
-## Execução do Projeto
-
-O projeto deverá conter um `README.md` com:
-
-- Pré-requisitos
-- Passo a passo para instalação
-- Como executar a aplicação localmente
-- Como testar os endpoints
-- Exemplos de requisições (ex: via cURL ou Postman)
+- A lógica de processamento do JSON está no método "processUsersFile" no UserService.
+- Os dois endpoints estão em UserController.
+- Abstração via JPA/Hibernate.
+- Utilizando SQLite.
