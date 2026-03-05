@@ -42,6 +42,7 @@ Existem dois endpoints:
 
 ### 2. CURL
 - POST
+> **Nota:** Este endpoint espera uma requisição do tipo `multipart/form-data`. O campo do formulário deve se chamar `file` e conter um arquivo de formato `.json`.
 ```
   curl -X POST http://localhost:8080/users/upload \
   -F "file=@mock-data.json"
