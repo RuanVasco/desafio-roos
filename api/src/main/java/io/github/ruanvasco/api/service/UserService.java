@@ -8,10 +8,8 @@ import io.github.ruanvasco.api.mapper.UserMapper;
 import io.github.ruanvasco.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.MappingIterator;
 import tools.jackson.databind.ObjectMapper;
 
@@ -32,15 +30,19 @@ public class UserService {
 
     @Transactional
     public void processUsersFromUrl(String url) {
-        try (InputStream inputStream = restClient.get()
-                .uri(url)
-                .retrieve()
-                .body(InputStream.class)) {
+        try {
+            byte[] fileBytes = restClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .body(byte[].class);
 
-            if (inputStream != null) {
-                saveInBatches(inputStream);
+            if (fileBytes != null && fileBytes.length > 0) {
+                try (InputStream inputStream = new java.io.ByteArrayInputStream(fileBytes)) {
+                    saveInBatches(inputStream);
+                }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new FileProcessingException("Error fetching or processing remote JSON", e);
         }
     }

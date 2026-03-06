@@ -33,7 +33,7 @@
 
 ## Testar os endpoints
 Existem dois endpoints:
-- POST /users/upload
+- POST /users/import
 - GET /users/{id}
 
 ### 1. Swagger
@@ -44,8 +44,8 @@ Existem dois endpoints:
 - POST
 > **Nota:** Este endpoint espera uma requisição do tipo `multipart/form-data`. O campo do formulário deve se chamar `file` e conter um arquivo de formato `.json`.
 ```
-  curl -X POST http://localhost:8080/users/upload \
-  -F "file=@mock-data.json"
+  curl -X POST http://localhost:8080/users/import \
+  -F "url=https://url-example.com"
   ```
 - GET
 ```
