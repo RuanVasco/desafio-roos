@@ -44,7 +44,7 @@ Existem dois endpoints:
 - POST
 ```
   curl -X POST http://localhost:8080/users/import \
-  -F "url=https://url-example.com"
+  -F "url=https://raw.githubusercontent.com/Sementes-Roos/user-data-processing-api/refs/heads/main/mock-data.json"
   ```
 - GET
 ```
