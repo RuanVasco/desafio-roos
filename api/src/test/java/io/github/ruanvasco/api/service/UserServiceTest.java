@@ -1,5 +1,11 @@
 package io.github.ruanvasco.api.service;
 
+import org.mockito.Answers;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.MappingIterator;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
@@ -16,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -37,6 +44,9 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private RestClient restClient;
 
     @Test
     void findByIdReturnsUserDtoWhenUserExists() {
@@ -66,36 +76,17 @@ public class UserServiceTest {
     }
 
     @Test
-    void processUsersFileThrowsFileProcessingExceptionOnError() throws IOException {
-        MultipartFile file = mock(MultipartFile.class);
+    void processUsersFromUrlThrowsFileProcessingExceptionOnError() {
+        String url = "http://invalid-url.com/users.json";
 
-        when(file.getInputStream()).thenThrow(new IOException());
+        when(restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(InputStream.class))
+                .thenThrow(new RuntimeException("Connection failed"));
 
-        assertThrows(FileProcessingException.class, () -> userService.processUsersFile(file));
+        assertThrows(FileProcessingException.class, () -> userService.processUsersFromUrl(url));
     }
 
-    @Test
-    void processUsersFileSavesUsersSuccessfully() throws IOException {
-        MultipartFile file = mock(MultipartFile.class);
-        InputStream inputStream = mock(InputStream.class);
-        ObjectReader objectReader = mock(ObjectReader.class);
-        MappingIterator<UserDto> iterator = mock(MappingIterator.class);
-
-        UserDto userDto = new UserDto("123", "John", "Doe", "john@email.com");
-        User user = new User("123", "John", "Doe", "john@email.com");
-
-        when(file.getInputStream()).thenReturn(inputStream);
-        when(objectMapper.readerFor(UserDto.class)).thenReturn(objectReader);
-
-        doReturn(iterator).when(objectReader).readValues(inputStream);
-
-        when(iterator.hasNext()).thenReturn(true, false);
-        when(iterator.next()).thenReturn(userDto);
-        when(userMapper.toEntity(userDto)).thenReturn(user);
-
-        userService.processUsersFile(file);
-
-        verify(userRepository, times(1)).saveAll(anyList());
-    }
 
 }

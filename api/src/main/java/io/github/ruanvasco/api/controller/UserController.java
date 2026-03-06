@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/users")
@@ -22,14 +21,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload and process users JSON file", description = "Receives a JSON file via form-data and processes users in batches.")
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Import and process users from a remote JSON URL")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "File processed successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid file or processing error", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Import started successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid URL or processing error", content = @Content)
     })
-    public ResponseEntity<Void> uploadUsers(@RequestParam("file") MultipartFile file) {
-        userService.processUsersFile(file);
+    public ResponseEntity<Void> importUsers(@RequestParam("url") String url) {
+        userService.processUsersFromUrl(url);
         return ResponseEntity.ok().build();
     }
 

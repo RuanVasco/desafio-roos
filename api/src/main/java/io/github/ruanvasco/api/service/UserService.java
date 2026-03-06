@@ -8,11 +8,14 @@ import io.github.ruanvasco.api.mapper.UserMapper;
 import io.github.ruanvasco.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.MappingIterator;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,30 +27,40 @@ public class UserService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final UserMapper userMapper;
+    private final RestClient restClient;
+
 
     @Transactional
-    public void processUsersFile(MultipartFile file) {
-        try (InputStream inputStream = file.getInputStream()) {
-            MappingIterator<UserDto> iterator = objectMapper.readerFor(UserDto.class).readValues(inputStream);
-            List<User> userBatch = new ArrayList<>();
-            int batchSize = 1000;
+    public void processUsersFromUrl(String url) {
+        try (InputStream inputStream = restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(InputStream.class)) {
 
-            while (iterator.hasNext()) {
-                UserDto userDto = iterator.next();
-                userBatch.add(userMapper.toEntity(userDto));
-
-                if (userBatch.size() >= batchSize ) {
-                    userRepository.saveAll(userBatch);
-                    userBatch.clear();
-                }
+            if (inputStream != null) {
+                saveInBatches(inputStream);
             }
-
-            if (!userBatch.isEmpty()) {
-                userRepository.saveAll(userBatch);
-            }
-
         } catch (Exception e) {
-            throw new FileProcessingException("Error processing JSON file", e);
+            throw new FileProcessingException("Error fetching or processing remote JSON", e);
+        }
+    }
+
+    private void saveInBatches(InputStream inputStream) throws IOException {
+        MappingIterator<UserDto> iterator = objectMapper.readerFor(UserDto.class).readValues(inputStream);
+        List<User> batch = new ArrayList<>();
+        int batchSize = 1000;
+
+        while (iterator.hasNext()) {
+            batch.add(userMapper.toEntity(iterator.next()));
+
+            if (batch.size() >= batchSize) {
+                userRepository.saveAll(batch);
+                batch.clear();
+            }
+        }
+
+        if (!batch.isEmpty()) {
+            userRepository.saveAll(batch);
         }
     }
 
