@@ -42,7 +42,6 @@ public class UserService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new FileProcessingException("Error fetching or processing remote JSON", e);
         }
     }
