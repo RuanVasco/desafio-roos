@@ -42,7 +42,6 @@ Existem dois endpoints:
 
 ### 2. CURL
 - POST
-> **Nota:** Este endpoint espera uma requisição do tipo `multipart/form-data`. O campo do formulário deve se chamar `file` e conter um arquivo de formato `.json`.
 ```
   curl -X POST http://localhost:8080/users/import \
   -F "url=https://url-example.com"
@@ -56,7 +55,7 @@ Existem dois endpoints:
 
 ## Notas sobre o código
 
-- A lógica de processamento do JSON está no método "processUsersFile" no UserService.
+- A lógica de processamento do JSON está no método "processUsersFromUrl" no UserService.
 - Os dois endpoints estão em UserController.
 - Abstração via JPA/Hibernate.
 - Utilizando SQLite.
