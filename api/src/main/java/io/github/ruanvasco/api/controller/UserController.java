@@ -27,7 +27,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Import started successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid URL or processing error", content = @Content)
     })
-    public ResponseEntity<Void> importUsers(@RequestParam("url") String url) {
+    public ResponseEntity<Void> importUsers(@RequestPart("url") String url) {
         userService.processUsersFromUrl(url);
         return ResponseEntity.ok().build();
     }
